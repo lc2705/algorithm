@@ -1,66 +1,132 @@
 #include <iostream>
-#include <map>
-
 using namespace std;
+int findIndexOfMax(int *a,int n);
 
-int main(）
+int main()
 {
 	int h,n;
-	int fi[30], di[30], ti[30],cnt[30],fish;
+	int fi[30], di[30], ti[30],cnt[30],fish[30];
+	int fishSum;
 	int i,j;
 
-	multimap<int,int> lack;
-	while(1)
+	cin >> n;
+	while(n)
 	{
-		cin >> n;
-		if(n == 0) break;
 		cin >> h;
-		lack.erase();
-
 		for(i = 0; i < n; i++)
 		{
 			cin >> fi[i];
-			cnt[i] = 0;
-			lack.insert( make_pair(fi[i],i) );
 		}
 		for(i = 0; i < n; i++)
+		{
 			cin >> di[i];
+			cnt[i] = 0;
+			fish[i] = 0; 
+		}
+		
 		int tsum = 0;
 		for(i = 0; i < n-1; i++)
 		{
 			cin >> ti[i];
 			tsum += ti[i];
 		}
-
-		fish = 0;
-		multimap<int>::reverse_iterator iter;
-		int index;
 		
+		fishSum = 0;	
+		int index;
 		h = h * 12 - tsum;
+	
 		while(h > 0)
 		{
-			iter = lack.rbegin();
-			index = iter->second;
+			index = findIndexOfMax(fi, n);
+			if(fi[index] == 0)
+				break;
+			fish[index] += fi[index];
 			cnt[index]++;
-			fi[index] = (fi[index] - di[index] > 0) ? fi[index] - id[index] : 0;
-			
-			lack.erase(iter);
-			if(fi[index])
-				lack.insert(make_pair(fi[index],index));
+#ifdef DEGUBB
+			cout << "h :" << h <<endl;
+			cout << "index:" << index << " fi:" << fi[index] << " cnt:" << cnt[index] <<endl;	
+#endif
+			fi[index] -= di[index];
+			if(fi[index] < 0) 
+				fi[index] = 0;		
 			h--;
 		}
-
-		for(i = n - 2; i >= 0; i--)
+		
+		if(h > 0)
 		{
-			int tadd = ti[i] + cnt[i];
-			while(tadd > 0)
+			/*print result*/
+			cnt[0] += h;
+			for(i = 0;i < n - 1; i++)
 			{
-				iter = lack.rbegin();
-				tadd--;
+				cout << cnt[i] * 5 <<", ";
+				fishSum	+= fish[i];
 			}
+			cout << cnt[i] * 5 << endl;
+			fishSum += fish[i];
+			cout << "Number of fish expected: " << fishSum << endl;
 		}
-
+		else if(h == 0)
+		{
+			int tadd;
+			int lacknum = n;
+			int addfish = 0;
+			int addfishmax = 0;
+			int addcnt[30] = {0};
+			int addcnt_tmp[30] = {0};
+			for(i = n - 2; i >= 0; i--)
+			{
+				tadd = ti[i] + cnt[i + 1] + addcnt_tmp[i + 1];
+				while(tadd > 0)
+				{
+					index = findIndexOfMax(fi, i + 1);
+					if(fi[index] == 0)
+						break;
+#ifdef DEGUBB
+					cout << "index:" << index << " fi:" << fi[index] << " di" << di[index] << "    " << addfish <<endl;
+#endif					
+					addfish += fi[index];
+					addcnt_tmp[index]++;
+					fi[index] -= di[index];
+					if(fi[index] < 0) 
+						fi[index] = 0;
+					
+					tadd--;
+				}
+				addcnt_tmp[0] += tadd;
+				addfish -= fish[i + 1];
+				if(addfishmax < addfish) 
+				{	
+					for(j = 0; j < i+1 ; j++)
+						addcnt[j] = addcnt_tmp[j];
+					lacknum = i + 1;
+					addfishmax = addfish;
+				}
+			}
+			for(i = lacknum ; i < n; i++)
+				cnt[i] = addcnt[i] = 0;
+			
+			for(i = 0; i < n - 1; i++)
+			{
+				cout << (cnt[i] + addcnt[i]) * 5 << ", ";
+				fishSum += fish[i];
+			}
+			
+			cout << (cnt[i] + addcnt[i]) * 5 << endl;
+			fishSum += fish[i];
+			cout << "Number of fish expected: " << fishSum + addfishmax << endl;
+		}	
+		cin >> n;
 	}
-
 	return 0;
+}
+
+
+int findIndexOfMax(int *a,int n)
+{
+	int maxindex = 0;
+	for(int i = 0;i < n; i++)
+	{
+		if(a[i] > a[maxindex]) maxindex = i;
+	}
+	return maxindex;
 }
