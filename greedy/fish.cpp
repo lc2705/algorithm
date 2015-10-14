@@ -6,7 +6,7 @@ int main()
 {
 	int h,n;
 	int fi[30], di[30], ti[30],cnt[30],fish[30];
-	int fishSum;
+	int fishSum,lacknum;
 	int i,j;
 
 	cin >> n;
@@ -28,16 +28,28 @@ int main()
 		for(i = 0; i < n-1; i++)
 		{
 			cin >> ti[i];
-			tsum += ti[i];
 		}
+		ti[i] = 0;
 		
 		fishSum = 0;	
 		int index;
-		h = h * 12 - tsum;
+		h = h * 12;
+		i = 0;
+		while(i < n)
+		{
+			if(h < ti[i])
+			{
+				i++;
+				break;
+			}
+			h -= ti[i];
+			i++;
+		}
+		lacknum = i;
 	
 		while(h > 0)
 		{
-			index = findIndexOfMax(fi, n);
+			index = findIndexOfMax(fi, lacknum);
 			if(fi[index] == 0)
 				break;
 			fish[index] += fi[index];
@@ -52,69 +64,55 @@ int main()
 			h--;
 		}
 		
-		if(h > 0)
+		cnt[0] += h;
+		int tadd;
+		int addfish = 0;
+		int addfishmax = 0;
+		int addcnt[30] = {0};
+		int addcnt_tmp[30] = {0};
+		int lacknum_tmp = lacknum;
+		for(i = lacknum - 2; i >= 0; i--)
 		{
-			/*print result*/
-			cnt[0] += h;
-			for(i = 0;i < n - 1; i++)
+			tadd = ti[i] + cnt[i + 1] + addcnt_tmp[i + 1];
+			while(tadd > 0)
 			{
-				cout << cnt[i] * 5 <<", ";
-				fishSum	+= fish[i];
-			}
-			cout << cnt[i] * 5 << endl;
-			fishSum += fish[i];
-			cout << "Number of fish expected: " << fishSum << endl;
-		}
-		else if(h == 0)
-		{
-			int tadd;
-			int lacknum = n;
-			int addfish = 0;
-			int addfishmax = 0;
-			int addcnt[30] = {0};
-			int addcnt_tmp[30] = {0};
-			for(i = n - 2; i >= 0; i--)
-			{
-				tadd = ti[i] + cnt[i + 1] + addcnt_tmp[i + 1];
-				while(tadd > 0)
-				{
-					index = findIndexOfMax(fi, i + 1);
-					if(fi[index] == 0)
-						break;
+				index = findIndexOfMax(fi, i + 1);
+				if(fi[index] == 0)
+					break;
 #ifdef DEGUBB
-					cout << "index:" << index << " fi:" << fi[index] << " di" << di[index] << "    " << addfish <<endl;
+				cout << "index:" << index << " fi:" << fi[index] << " di" << di[index] << "    " << addfish <<endl;
 #endif					
-					addfish += fi[index];
-					addcnt_tmp[index]++;
-					fi[index] -= di[index];
-					if(fi[index] < 0) 
-						fi[index] = 0;
-					
-					tadd--;
-				}
-				addcnt_tmp[0] += tadd;
-				addfish -= fish[i + 1];
-				if(addfishmax < addfish) 
-				{	
-					for(j = 0; j < i+1 ; j++)
-						addcnt[j] = addcnt_tmp[j];
-					lacknum = i + 1;
-					addfishmax = addfish;
-				}
+				addfish += fi[index];
+				addcnt_tmp[index]++;
+				fi[index] -= di[index];
+				if(fi[index] < 0) 
+					fi[index] = 0;
+				
+				tadd--;
 			}
-			for(i = lacknum ; i < n; i++)
-				cnt[i] = addcnt[i] = 0;
-			
-			for(i = 0; i < n - 1; i++)
-			{
-				cout << (cnt[i] + addcnt[i]) * 5 << ", ";
-				fishSum += fish[i];
+			addcnt_tmp[0] += tadd;
+			addfish -= fish[i + 1];
+			if(addfishmax <= addfish) 
+			{	
+				for(j = 0; j < i+1 ; j++)
+					addcnt[j] = addcnt_tmp[j];
+				lacknum_tmp = i + 1;
+				addfishmax = addfish;
 			}
+		}
+		for(i = lacknum_tmp ; i < n; i++)
+			cnt[i] = addcnt[i] = 0;
 			
-			cout << (cnt[i] + addcnt[i]) * 5 << endl;
+		for(i = 0; i < n - 1; i++)
+		{
+			cout << (cnt[i] + addcnt[i]) * 5 << ", ";
 			fishSum += fish[i];
-			cout << "Number of fish expected: " << fishSum + addfishmax << endl;
-		}	
+		}
+			
+		cout << (cnt[i] + addcnt[i]) * 5 << endl;
+		fishSum += fish[i];
+		cout << "Number of fish expected: " << fishSum + addfishmax << endl << endl;
+		
 		cin >> n;
 	}
 	return 0;

@@ -19,10 +19,18 @@ int main()
 		int tmp;
 		cin >> n >> k;
 		for(i = 0; i < n; i++)
+		{
 			cin >> w[i].beg >> tmp >> w[i].end >> tmp;
+			if(w[i].end < w[i].beg)
+			{
+				tmp = w[i].end;
+				w[i].end = w[i].beg;
+				w[i].beg = tmp;
+			}
+		}	
 		
 		memset(wn, 0, sizeof(int) * 100);
-		sort(w, w + n, cmp);
+		//sort(w, w + n, cmp);
 		for(i = 0; i < n; i++)
 			for(j = w[i].beg; j <= w[i].end; j++)
 				wn[j]++;
