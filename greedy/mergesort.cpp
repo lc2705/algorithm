@@ -1,10 +1,9 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <cstdlib>
+#include <sys/time.h>
 #define MAXLEN 1000010
 #define INSORTNUM 10
-//#define DEBUG
 
 using namespace std;
 
@@ -19,45 +18,41 @@ node link[MAXLEN];
 void MergeSortL( int low, int high, node *p);
 void InSort( int low, int high, node *p);
 void MergeL(node q, node r, node *p);
-int init(node *head);  //return the number  of element
+int init();  //return the number  of element
 void printArray(node *head);
 
 int main(int argc, char **argv)
 {
     node head;
-    int num = init(&head);
+    struct timeval start_t,end_t;
+    
+    int num = init();
+    gettimeofday(&start_t,NULL);
     MergeSortL(0, num, &head);
-    printArray(&head);
+    gettimeofday(&end_t,NULL);
+   	
+	cout << end_t.tv_sec - start_t.tv_sec << '.' << end_t.tv_usec - start_t.tv_usec << endl;
+ //   printArray(&head);
 }
 
-int init(node *head)
+int init()
 {
     ifstream file;
     char value[50];
 
-    file.open("test");
+    file.open("test_1000000");
     if( !file.is_open())
     {
         cout << "File open failed !" << endl;
         exit(-1);
     }
 
-    head->next = NULL;
     int n = 0;
-    node *p = head;
-    node *tmp;
     while(file >> value )
     {
-        tmp = &link[n];
-        tmp->val = atoi(value);
-        tmp->next = NULL;
- //       p->next = tmp;
-   //     p = p->next;
+        link[n].val = atoi(value);
+        link[n].next = NULL;
         n++;
-    #ifdef DEBUG
-        cout << tmp << endl;
-        cout << a[n-1] << endl;
-    #endif // DEBUG
     }
     file.close();
     return n;
@@ -66,18 +61,21 @@ int init(node *head)
 void printArray(node *head)
 {
     node *p = head->next;
+    int n = 0;
     while(p != NULL)
     {
         cout << p->val << endl;
         p = p->next;
+        n++;
     }
+    cout << n << endl;
 }
 
 void InSort(int low, int high, node *head)
 {
     int i, j;
     node *p = NULL, *q, *r;
-    head->next = link;
+    head->next = &link[low];
 
     for(i = low + 1; i < high; i++)
     {
@@ -122,26 +120,26 @@ void MergeL(node q, node r, node *head)
         if(n->val < m->val)
         {
             p->next = n;
-            p = p->next;
+            p = n;
             n = n->next;
         }
         else
         {
             p->next = m;
-            p = p->next;
+            p = m;
             m = m->next;
         }
     }
     while(n != NULL)
     {
         p->next = n;
-        p = p->next;
+        p = n;
         n = n->next;
     }
     while(m != NULL)
     {
         p->next = m;
-        p = p->next;
+        p = m;
         m = m->next;
     }
     p->next = NULL;
