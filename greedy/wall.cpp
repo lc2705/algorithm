@@ -4,7 +4,7 @@
 #include <set>
 using namespace std;
 
-#define WIDTH 100
+#define WIDTH 105
 struct wall
 {
 	int beg;
@@ -25,6 +25,7 @@ struct cmp
 int main()
 {
 	int T,n,k;
+	int res[15];
 	multiset<wall,cmp> wset;
 	int wn[WIDTH];
 	cin >> T;
@@ -33,7 +34,8 @@ int main()
 		wall tmp;
 		int i,j,val;
 		int cnt = 0;
-		memset(wn,0,sizeof(int) * 100);
+		memset(wn,0,sizeof(int) * WIDTH);
+		wset.clear();
 		
 		cin >> n >> k;
 		for(i = 0; i < n; i++)
@@ -49,10 +51,10 @@ int main()
 			for(j = tmp.beg; j <= tmp.end; j++)
 				wn[j]++;
 		}
-		for(i = 0; i < WIDTH; i++)
-		{
-			cout << wn[i] << endl;
-		}
+//		for(i = 0; i < WIDTH; i++)
+//		{
+//			cout << wn[i] << endl;
+//		}
 		
 		for(i = 0; i < WIDTH; i++)
 		{
@@ -63,7 +65,7 @@ int main()
 				{
 					if(iter->beg <= i)
 					{
-						cout << iter->beg << " " << iter->end << endl;
+				//		cout << iter->beg << " " << iter->end << endl;
 						for(int s = iter->beg; s <= iter->end; s++)
 							wn[s]--;
 						wset.erase(iter);
